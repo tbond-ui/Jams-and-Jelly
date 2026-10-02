@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Preserves</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { 
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      max-width: 600px; 
+      margin: 0 auto; 
+      padding: 15px; 
+      background-color: #fff0f5; /* Soft pink background */
+      color: #2d3436;
+    }
+    
+    /* Playful Header */
+    h2 { 
+      font-size: 2.2em;
+      text-align: center; 
+      color: #ff4757; 
+      text-shadow: 2px 2px 0px #ffeaa7;
+      margin-bottom: 20px;
+    }
+    
+    /* Chunky Tab Navigation */
+    .tab-nav { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tab-btn { 
+      flex: 1; padding: 15px; font-size: 1.1em; font-weight: 900; 
+      background: white; color: #2d3436; 
+      border: 3px solid #2d3436; border-radius: 12px; 
+      box-shadow: 4px 4px 0px #2d3436; cursor: pointer; transition: all 0.1s;
+    }
+    .tab-btn.active { background: #ff4757; color: white; box-shadow: 2px 2px 0px #2d3436; transform: translate(2px, 2px); }
+    
+    .section-container { display: none; }
+    .section-container.active { display: block; animation: popIn 0.3s ease-out; }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.98); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    label.section-title { font-weight: 900; font-size: 1.3em; display: block; margin-top: 25px; margin-bottom: 15px; color: #ff4757;}
+    
+    /* Chunky Inputs */
+    input[type="number"], select, input[type="text"] { 
+      width: 100%; padding: 15px; font-size: 1.1em; font-weight: bold;
+      border-radius: 12px; border: 3px solid #2d3436; box-sizing: border-box; 
+      background: white; margin-bottom: 15px; box-shadow: 3px 3px 0px #ffeaa7;
+    }
+    input:focus, select:focus { outline: none; border-color: #ff4757; }
+
+    /* Cool Tap-Friendly Fruit Pills */
+    .scroll-box { max-height: 280px; overflow-y: auto; padding-bottom: 10px; }
+    .fruit-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    
+    .fruit-option { 
+      background: white; border: 3px solid #2d3436; padding: 12px 18px; 
+      border-radius: 30px; font-weight: bold; font-size: 1.1em; color: #2d3436; 
+      cursor: pointer; box-shadow: 3px 3px 0px #2d3436; transition: all 0.1s;
+    }
+    .fruit-option input { display: none; } /* Hide the ugly checkbox */
+    
+    /* When selected, the pill turns bright red and presses down */
+    .fruit-option:has(input:checked) { 
+      background: #ff4757; color: white; box-shadow: 1px 1px 0px #2d3436; transform: translate(2px, 2px);
+    }
+    
+    /* Bouncy Save Button */
+    .save-btn { 
+      width: 100%; background-color: #1e90ff; color: white; border: 3px solid #2d3436; 
+      padding: 18px; font-size: 1.3em; font-weight: 900; border-radius: 16px; 
+      margin-top: 15px; cursor: pointer; box-shadow: 5px 5px 0px #2d3436; transition: all 0.1s;
+    }
+    .save-btn:active { box-shadow: 0px 0px 0px #2d3436; transform: translate(5px, 5px); }
+
+    /* Result Card */
+    .result-card { 
+      background: white; padding: 25px; border-radius: 16px; border: 3px solid #2d3436;
+      box-shadow: 6px 6px 0px #ff4757; margin-top: 25px;
+    }
+    .row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1.2em; border-bottom: 2px dashed #ccc; padding-bottom: 10px; font-weight: bold;}
+    .row:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+    .row span.bold { font-weight: 900; color: #ff4757; font-size: 1.3em; }
+
+    /* Research Tab Styles */
+    textarea { 
+      width: 100%; height: 200px; padding: 15px; font-size: 1.1em; font-weight: bold;
+      border-radius: 12px; border: 3px solid #2d3436; box-sizing: border-box; 
+      background: white; font-family: inherit; box-shadow: 4px 4px 0px #7bed9f;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🍓 Jam Math</h2>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" id="btn-calc" onclick="switchTab('calc')">Calculator</button>
+    <button class="tab-btn" id="btn-research" onclick="switchTab('research')">Notes</button>
+  </div>
+
+  <div id="tab-calc" class="section-container active">
+    
+    <label class="section-title">Select Fruit</label>
+    <input type="text" id="fruitSearch" placeholder="Search fruits..." onkeyup="filterFruits()">
+    
+    <div class="scroll-box">
+      <div class="fruit-grid" id="fruitCheckboxes"></div>
+    </div>
+
+    <label class="section-title" for="sugarLevel">Sugar Level</label>
+    <select id="sugarLevel" onchange="calculate()">
+      <option value="0.80">High Sugar (80% - Perfect Set)</option>
+      <option value="0.65" selected>Medium Sugar (65%)</option>
+      <option value="0.50">Low Sugar (50% - Soft Set)</option>
+    </select>
+
+    <label class="section-title" for="fruitGrams">Total Weight (grams)</label>
+    <input type="number" id="fruitGrams" value="1000" oninput="calculate()" inputmode="numeric">
+
+    <button class="save-btn" id="saveBtn" onclick="saveRecipe()">Save Recipe</button>
+
+    <div class="result-card">
+      <div class="row">
+        <span>Sugar Needed</span> <span id="sugar" class="bold">650g</span>
+      </div>
+      <div class="row">
+        <span>Lemon Juice (Acid)</span> <span id="lemon" class="bold">15g</span>
+      </div>
+      <div class="row">
+        <span>Powdered Pectin</span> <span id="pectin" class="bold">10g</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-research" class="section-container">
+    <label class="section-title">Experiment Vault</label>
+    <textarea id="researchNotes" placeholder="Type your batch notes here. Everything saves securely to your device..."></textarea>
+    <button class="save-btn" style="background-color: #2ed573;" id="saveNotesBtn" onclick="saveNotes()">Save Notes</button>
+  </div>
+
+  <script>
+    const fruitData = {
+      "Apple": { pectin: 0.005, acid: 0.005 },
+      "Apricot": { pectin: 0.010, acid: 0.010 },
+      "Blackberry": { pectin: 0.010, acid: 0.015 },
+      "Blueberry": { pectin: 0.012, acid: 0.020 },
+      "Boysenberry": { pectin: 0.010, acid: 0.015 },
+      "Cherry (Sweet)": { pectin: 0.015, acid: 0.020 },
+      "Cherry (Tart)": { pectin: 0.010, acid: 0.005 },
+      "Cloudberry": { pectin: 0.010, acid: 0.010 },
+      "Cranberry": { pectin: 0.005, acid: 0.005 },
+      "Currant": { pectin: 0.005, acid: 0.005 },
+      "Elderberry": { pectin: 0.015, acid: 0.020 },
+      "Fig": { pectin: 0.015, acid: 0.020 },
+      "Gooseberry": { pectin: 0.005, acid: 0.005 },
+      "Grape": { pectin: 0.005, acid: 0.010 },
+      "Guava": { pectin: 0.005, acid: 0.010 },
+      "Huckleberry": { pectin: 0.012, acid: 0.015 },
+      "Jalapeño": { pectin: 0.015, acid: 0.020 },
+      "Kiwi": { pectin: 0.015, acid: 0.010 },
+      "Lingonberry": { pectin: 0.005, acid: 0.005 },
+      "Mango": { pectin: 0.012, acid: 0.015 },
+      "Marionberry": { pectin: 0.010, acid: 0.015 },
+      "Melon": { pectin: 0.015, acid: 0.020 },
+      "Nectarine": { pectin: 0.012, acid: 0.018 },
+      "Orange": { pectin: 0.005, acid: 0.005 },
+      "Peach": { pectin: 0.012, acid: 0.018 },
+      "Pear": { pectin: 0.015, acid: 0.020 },
+      "Pineapple": { pectin: 0.015, acid: 0.005 },
+      "Plum": { pectin: 0.005, acid: 0.005 },
+      "Pomegranate": { pectin: 0.015, acid: 0.005 },
+      "Raspberry": { pectin: 0.008, acid: 0.010 },
+      "Rhubarb": { pectin: 0.015, acid: 0.005 },
+      "Strawberry": { pectin: 0.015, acid: 0.020 },
+      "Tomato": { pectin: 0.015, acid: 0.010 }
+    };
+
+    function populateFruits() {
+      const grid = document.getElementById('fruitCheckboxes');
+      Object.keys(fruitData).sort().forEach(fruit => {
+        let label = document.createElement('label');
+        label.className = 'fruit-option';
+        label.innerHTML = `<input type="checkbox" value="${fruit}" onchange="calculate()"> ${fruit}`;
+        grid.appendChild(label);
+      });
+    }
+
+    function filterFruits() {
+      let query = document.getElementById('fruitSearch').value.toLowerCase();
+      let options = document.querySelectorAll('.fruit-option');
+      options.forEach(opt => {
+        opt.style.display = opt.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
+      });
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.section-container, .tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('btn-' + tab).classList.add('active');
+    }
+
+    function calculate() {
+      let weight = parseFloat(document.getElementById('fruitGrams').value) || 0;
+      let sugarRatio = parseFloat(document.getElementById('sugarLevel').value);
+      let checkboxes = document.querySelectorAll('#fruitCheckboxes input[type="checkbox"]:checked');
+      
+      let targetPectinRatio = 0.010, targetAcidRatio = 0.015;   
+
+      if (checkboxes.length > 0) {
+        let totalPectin = 0, totalAcid = 0;
+        checkboxes.forEach(cb => {
+          totalPectin += fruitData[cb.value].pectin;
+          totalAcid += fruitData[cb.value].acid;
+        });
+        targetPectinRatio = totalPectin / checkboxes.length;
+        targetAcidRatio = totalAcid / checkboxes.length;
+      }
+
+      document.getElementById('sugar').innerText = Math.round(weight * sugarRatio) + 'g';
+      document.getElementById('lemon').innerText = Math.round(weight * targetAcidRatio) + 'g';
+      document.getElementById('pectin').innerText = Math.round(weight * targetPectinRatio) + 'g';
+    }
+
+    function saveRecipe() {
+      let weight = document.getElementById('fruitGrams').value;
+      let sugar = document.getElementById('sugarLevel').value;
+      let selectedFruits = Array.from(document.querySelectorAll('#fruitCheckboxes input[type="checkbox"]:checked')).map(cb => cb.value);
+      localStorage.setItem('masterJamSettings', JSON.stringify({ weight, sugar, fruits: selectedFruits }));
+      
+      let btn = document.getElementById('saveBtn');
+      btn.innerText = "YUM! Saved! 🍓";
+      setTimeout(() => btn.innerText = "Save Recipe", 2000);
+    }
+
+    function saveNotes() {
+      localStorage.setItem('masterJamNotes', document.getElementById('researchNotes').value);
+      let btn = document.getElementById('saveNotesBtn');
+      btn.innerText = "Locked in the Vault! 🔒";
+      setTimeout(() => btn.innerText = "Save Notes", 2000);
+    }
+
+    function loadAppData() {
+      let savedRecipe = localStorage.getItem('masterJamSettings');
+      if (savedRecipe) {
+        let recipe = JSON.parse(savedRecipe);
+        document.getElementById('fruitGrams').value = recipe.weight;
+        document.getElementById('sugarLevel').value = recipe.sugar;
+        recipe.fruits.forEach(fruitVal => {
+          let cb = document.querySelector(`#fruitCheckboxes input[value="${fruitVal}"]`);
+          if (cb) cb.checked = true;
+        });
+      }
+      let savedNotes = localStorage.getItem('masterJamNotes');
+      if (savedNotes) document.getElementById('researchNotes').value = savedNotes;
+      calculate();
+    }
+
+    populateFruits();
+    loadAppData();
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</body>
+</html>
