@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Bright background matching the app theme -->
+  <rect width="512" height="512" fill="#ffeaa7" rx="100"/>
+  
+  <!-- Glass jar body -->
+  <path d="M 156 180 C 156 180 120 220 120 300 C 120 400 140 430 180 430 L 332 430 C 372 430 392 400 392 300 C 392 220 356 180 356 180 Z" fill="#ff4757" stroke="#2d3436" stroke-width="20"/>
+  
+  <!-- Jar lid -->
+  <rect x="146" y="120" width="220" height="60" fill="#74b9ff" stroke="#2d3436" stroke-width="20" rx="15"/>
+  <line x1="166" y1="150" x2="346" y2="150" stroke="#2d3436" stroke-width="10" stroke-linecap="round" opacity="0.3"/>
+  
+  <!-- Paper label -->
+  <rect x="196" y="240" width="120" height="100" fill="#ffffff" stroke="#2d3436" stroke-width="15" rx="15"/>
+  
+  <!-- Strawberry / Heart symbol on the label -->
+  <path d="M 256 270 C 246 250 216 260 226 290 L 256 320 L 286 290 C 296 260 266 250 256 270 Z" fill="#ff4757"/>
+  
+  <!-- Highlights for glass effect -->
+  <path d="M 150 280 C 150 350 160 380 180 400" fill="none" stroke="#ffffff" stroke-width="15" stroke-linecap="round" opacity="0.4"/>
+</svg>
